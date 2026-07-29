@@ -1,0 +1,10 @@
+extends: default
+
+rules:
+  # No YAML file in this repository uses an explicit document start
+  document-start: disable
+  # Action versions pinned by commit SHA exceed the default limit
+  line-length: disable
+  # GitHub Actions requires the "on" key, which YAML 1.1 reads as a boolean
+  truthy:
+    check-keys: false
