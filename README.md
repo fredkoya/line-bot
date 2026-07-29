@@ -4,23 +4,14 @@ LINE Messaging API のwebhookを受け取り、OpenAI の応答を返信する L
 
 ## 必要環境
 
-- Node.js 24 以上（`.nvmrc` / `volta` でバージョンを固定）
+Node.js のバージョンは Docker イメージ（`node:24.18.0-bookworm-slim`）で固定している。Docker で起動する場合、ホストに Node.js をインストールする必要はない。
 
-TypeScript は Node の型ストリップ機能で直接実行するため、実行用のトランスパイラは不要。
+ホストで直接動かす場合は Node.js 24 以上が必要。TypeScript は Node の型ストリップ機能で直接実行するため、実行用のトランスパイラは不要。
 
-## セットアップ
+## Docker で起動する（推奨）
 
 ```sh
 cp .env.example .env   # 各値を設定する
-npm ci
-npm run dev
-```
-
-## Docker で起動する
-
-ローカル開発用。`.env` を用意したうえで実行する。
-
-```sh
 docker compose up --build
 ```
 
@@ -31,6 +22,14 @@ docker compose restart app
 ```
 
 `node --watch` による自動リロードはコンテナ内では機能しない。Docker Desktop の virtiofs 越しにファイル変更の inotify イベントが伝わらないため。ホスト側の `npm run dev` では従来どおり自動リロードが効く。
+
+## ホストで直接起動する
+
+```sh
+cp .env.example .env   # 各値を設定する
+npm ci
+npm run dev
+```
 
 ## 環境変数
 
