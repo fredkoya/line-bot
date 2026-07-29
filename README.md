@@ -16,6 +16,22 @@ npm ci
 npm run dev
 ```
 
+## Docker で起動する
+
+ローカル開発用。`.env` を用意したうえで実行する。
+
+```sh
+docker compose up --build
+```
+
+`src/` と `tsconfig.json` はバインドマウントしているため、コードを変更したら再ビルドせずに反映できる。
+
+```sh
+docker compose restart app
+```
+
+`node --watch` による自動リロードはコンテナ内では機能しない。Docker Desktop の virtiofs 越しにファイル変更の inotify イベントが伝わらないため。ホスト側の `npm run dev` では従来どおり自動リロードが効く。
+
 ## 環境変数
 
 | 変数 | 説明 |
