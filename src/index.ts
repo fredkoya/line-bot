@@ -1,58 +1,72 @@
-import * as dotenv from "dotenv";
-import express from "express";
+import express, { type ErrorRequestHandler } from "express";
 import cors from "cors";
-import { middleware, messagingApi, WebhookEvent } from "@line/bot-sdk";
+import {
+  middleware,
+  messagingApi,
+  SignatureValidationFailed,
+  JSONParseError,
+  type webhook,
+} from "@line/bot-sdk";
 import OpenAI from "openai";
 
-dotenv.config();
+const channelSecret = process.env.LINE_CHANNEL_SECRET ?? "";
+const channelAccessToken = process.env.LINE_CHANNEL_ACCESS_TOKEN ?? "";
 
-const { MessagingApiClient } = messagingApi;
+const openai = new OpenAI();
+const lineClient = new messagingApi.MessagingApiClient({ channelAccessToken });
 
-const config = {
-  channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN || "",
-  channelSecret: process.env.LINE_CHANNEL_SECRET || "",
-};
+async function handleEvent(event: webhook.Event): Promise<void> {
+  if (event.type !== "message") return;
+  if (event.message.type !== "text") return;
+  if (event.replyToken === undefined) return;
 
-const openai = new OpenAI({
-  apiKey: process.env.OPEN_AI_API_KEY || "",
-});
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4.1-mini",
+    messages: [{ role: "user", content: event.message.text }],
+  });
+  const text = completion.choices[0]?.message.content;
+  if (!text) return;
+
+  await lineClient.replyMessage({
+    replyToken: event.replyToken,
+    messages: [{ type: "text", text }],
+  });
+}
 
 const app = express();
 app.use(cors());
-app.use("/webhook", middleware(config));
-app.use(express.json());
+app.use("/webhook", middleware({ channelSecret }));
 
 app.post("/webhook", async (req, res) => {
-  const event: WebhookEvent = req.body.events[0];
-  if (event === undefined || event.type !== "message") {
-    res.sendStatus(200);
-    return;
-  }
+  const events: webhook.Event[] = req.body.events ?? [];
 
-  let userMessage = "";
-  if (event.message.type === "text") {
-    userMessage = event.message.text;
-  }
-
-  const chatCompletion = await openai.chat.completions.create({
-    messages: [{ role: "user", content: userMessage }],
-    model: "gpt-3.5-turbo",
-  });
-
-  const client = new MessagingApiClient({
-    channelAccessToken: config.channelAccessToken,
-  });
-
-  await client.replyMessage({
-    replyToken: event.replyToken,
-    messages: [
-      { type: "text", text: chatCompletion.choices[0].message.content },
-    ],
-  });
+  // LINE times out webhook deliveries quickly, so acknowledge before
+  // waiting on OpenAI.
   res.sendStatus(200);
+
+  await Promise.all(
+    events.map(event =>
+      handleEvent(event).catch(err => {
+        console.error("failed to handle event", err);
+      }),
+    ),
+  );
 });
 
-const PORT = process.env.PORT || 3000;
+const lineErrorHandler: ErrorRequestHandler = (err, _req, res, next) => {
+  if (err instanceof SignatureValidationFailed) {
+    res.status(401).json({ message: "invalid signature" });
+    return;
+  }
+  if (err instanceof JSONParseError) {
+    res.status(400).json({ message: "invalid request body" });
+    return;
+  }
+  next(err);
+};
+app.use(lineErrorHandler);
+
+const PORT = process.env.PORT ?? 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
