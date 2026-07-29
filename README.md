@@ -4,9 +4,12 @@ LINE Messaging API のwebhookを受け取り、OpenAI の応答を返信する L
 
 ## 必要環境
 
-Node.js のバージョンは Docker イメージ（`node:24.18.0-bookworm-slim`）で固定している。Docker で起動する場合、ホストに Node.js をインストールする必要はない。
+Node.js のバージョンは Docker イメージ（`node:24.18.0-bookworm-slim`）で固定している。
+Docker で起動する場合、ホストに Node.js をインストールする必要はない。
 
-ホストで直接動かす場合は Node.js 24 以上と pnpm 11.17.0 が必要（バージョンは `packageManager` フィールドで宣言している）。TypeScript は Node の型ストリップ機能で直接実行するため、実行用のトランスパイラは不要。
+ホストで直接動かす場合は Node.js 24 以上と pnpm 11.17.0 が必要
+（バージョンは `packageManager` フィールドで宣言している）。
+TypeScript は Node の型ストリップ機能で直接実行するため、実行用のトランスパイラは不要。
 
 ## Docker で起動する（推奨）
 
@@ -21,7 +24,9 @@ docker compose up --build
 docker compose restart app
 ```
 
-`node --watch` による自動リロードはコンテナ内では機能しない。Docker Desktop の virtiofs 越しにファイル変更の inotify イベントが伝わらないため。ホスト側の `pnpm run dev` では自動リロードが効く。
+`node --watch` による自動リロードはコンテナ内では機能しない。
+Docker Desktop の virtiofs 越しにファイル変更の inotify イベントが伝わらないため。
+ホスト側の `pnpm run dev` では自動リロードが効く。
 
 ## ホストで直接起動する
 
