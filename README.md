@@ -1,1 +1,39 @@
 # line-bot
+
+LINE Messaging API のwebhookを受け取り、OpenAI の応答を返信する LINE Bot。
+
+## 必要環境
+
+- Node.js 24 以上（`.nvmrc` / `volta` でバージョンを固定）
+
+TypeScript は Node の型ストリップ機能で直接実行するため、実行用のトランスパイラは不要。
+
+## セットアップ
+
+```sh
+cp .env.example .env   # 各値を設定する
+npm ci
+npm run dev
+```
+
+## 環境変数
+
+| 変数 | 説明 |
+| --- | --- |
+| `LINE_CHANNEL_ACCESS_TOKEN` | LINE Developers のチャネルアクセストークン |
+| `LINE_CHANNEL_SECRET` | webhook の署名検証に使うチャネルシークレット |
+| `OPENAI_API_KEY` | OpenAI の API キー。未設定だと起動時に失敗する |
+| `PORT` | 待ち受けポート（省略時は 3000） |
+
+## npm scripts
+
+| コマンド | 説明 |
+| --- | --- |
+| `npm run dev` | `.env` を読み込み、ファイル変更を監視して起動 |
+| `npm run typecheck` | 型チェックのみ実行 |
+| `npm run build` | `dist/` に JavaScript を出力 |
+| `npm start` | ビルド済みの `dist/index.js` を起動 |
+
+## エンドポイント
+
+`POST /webhook` — LINE からの webhook を受け取る。署名が不正な場合は 401、リクエストボディが不正な場合は 400 を返す。
