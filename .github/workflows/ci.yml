@@ -36,3 +36,13 @@ jobs:
           globs: |
             **/*.md
             !node_modules/**
+
+      - name: Actionlint
+        uses: reviewdog/action-actionlint@50842263c20a7c46bd0065b9e624d3c569db061e  # v1.73.0
+        with:
+          fail_level: error
+
+      - name: Yamllint
+        uses: reviewdog/action-yamllint@e02a49fdf53f51ddd8dfa89b09aa975043aeba38  # v1.23.0
+        with:
+          fail_level: error
