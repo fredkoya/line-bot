@@ -6,7 +6,7 @@ LINE Messaging API のwebhookを受け取り、OpenAI の応答を返信する L
 
 Node.js のバージョンは Docker イメージ（`node:24.18.0-bookworm-slim`）で固定している。Docker で起動する場合、ホストに Node.js をインストールする必要はない。
 
-ホストで直接動かす場合は Node.js 24 以上が必要。TypeScript は Node の型ストリップ機能で直接実行するため、実行用のトランスパイラは不要。
+ホストで直接動かす場合は Node.js 24 以上と pnpm 11.17.0 が必要（バージョンは `packageManager` フィールドで宣言している）。TypeScript は Node の型ストリップ機能で直接実行するため、実行用のトランスパイラは不要。
 
 ## Docker で起動する（推奨）
 
@@ -21,14 +21,14 @@ docker compose up --build
 docker compose restart app
 ```
 
-`node --watch` による自動リロードはコンテナ内では機能しない。Docker Desktop の virtiofs 越しにファイル変更の inotify イベントが伝わらないため。ホスト側の `npm run dev` では従来どおり自動リロードが効く。
+`node --watch` による自動リロードはコンテナ内では機能しない。Docker Desktop の virtiofs 越しにファイル変更の inotify イベントが伝わらないため。ホスト側の `pnpm run dev` では自動リロードが効く。
 
 ## ホストで直接起動する
 
 ```sh
 cp .env.example .env   # 各値を設定する
-npm ci
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 ## 環境変数
@@ -40,14 +40,14 @@ npm run dev
 | `OPENAI_API_KEY` | OpenAI の API キー。未設定だと起動時に失敗する |
 | `PORT` | 待ち受けポート（省略時は 3000） |
 
-## npm scripts
+## scripts
 
 | コマンド | 説明 |
 | --- | --- |
-| `npm run dev` | `.env` を読み込み、ファイル変更を監視して起動 |
-| `npm run typecheck` | 型チェックのみ実行 |
-| `npm run build` | `dist/` に JavaScript を出力 |
-| `npm start` | ビルド済みの `dist/index.js` を起動 |
+| `pnpm run dev` | `.env` を読み込み、ファイル変更を監視して起動 |
+| `pnpm run typecheck` | 型チェックのみ実行 |
+| `pnpm run build` | `dist/` に JavaScript を出力 |
+| `pnpm start` | ビルド済みの `dist/index.js` を起動 |
 
 ## エンドポイント
 
