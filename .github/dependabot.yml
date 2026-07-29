@@ -1,0 +1,27 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+      time: "05:00"
+      timezone: "Asia/Tokyo"
+    cooldown:
+      default-days: 3
+    commit-message:
+      prefix: "deps(workflow)"
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+      time: "05:00"
+      timezone: "Asia/Tokyo"
+    cooldown:
+      semver-major-days: 10
+      semver-minor-days: 5
+      semver-patch-days: 3
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "deps(pnpm)"
