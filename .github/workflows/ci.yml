@@ -38,7 +38,7 @@ jobs:
             !node_modules/**
 
       - name: Actionlint
-        uses: reviewdog/action-actionlint@d63ba7532e0942965320cd8d73cbae4c7b3c5283
+        uses: reviewdog/action-actionlint@419a49378266e892f40c773b4f2fc6de9aa87499
         with:
           fail_level: error
 
