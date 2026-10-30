@@ -43,6 +43,6 @@ jobs:
           fail_level: error
 
       - name: Yamllint
-        uses: reviewdog/action-yamllint@de68272fdca5f2a961fb309e0d2e13c2eb186d9e
+        uses: reviewdog/action-yamllint@072d1a6ca6f5a03de10f492f6119fcbc8d47302b
         with:
           fail_level: error
